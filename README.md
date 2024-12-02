@@ -51,7 +51,9 @@ Once the program is running, you will see a menu with several options:
 
 6. **Display All Tasks**: This will list all scheduled tasks in a tabular format.
 
-7. **Exit**: Exit the application.
+7. **Add Recurring Task**: Enter the task’s month, day, start hour, end hour, frequency (in hours), and a description to create a recurring task.
+
+9. **Exit**: Exit the application.
 
 ## Expected Output
 
@@ -89,5 +91,27 @@ Scheduled Tasks:
 Date      Time      Tasks
 ----------------------------------------
 25-12    10-12    Christmas Meeting
+```
+
+### Adding Recurring Task
+
+```plaintext
+Enter recurring task details:
+Month (1-12): 1
+Day (1-31): 1
+Start Time (Hour): 8
+End Time (Hour): 9
+Frequency (in hours): 24
+Task Description: Daily Morning Briefing
+```
+
+### Querying Recurring Task
+
+```plaintext
+Enter time to get task count:
+Month (1-12): 1
+Day (1-31): 2
+Hour: 8
+Tasks at 2-1 08:00 = 1
 ```
 
