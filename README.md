@@ -8,6 +8,7 @@ This is a simple task scheduling application implemented in C++. It allows users
 - Delete existing tasks.
 - Query the number of tasks scheduled at a specific time.
 - Retrieve tasks scheduled within a certain time interval.
+- Add recurring tasks at specific intervals.
 - Get the earliest task scheduled.
 - Display all scheduled tasks.
 
