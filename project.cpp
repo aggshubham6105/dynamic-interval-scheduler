@@ -352,90 +352,110 @@ public:
                  << (startTime + "-" + endTime) << taskList << endl;
         }
     }
+
+    // Function to add recurring tasks
+    void addRecurringTask(int year, int month, int day, int startHour, int endHour, const string &taskDescription, int frequency) {
+        // frequency is the number of hours between task repeats
+        int start = dateToHourOfYear(year, month, day, startHour);
+        int end = dateToHourOfYear(year, month, day, endHour);
+
+        if (start == -1 || end == -1 || start >= end) {
+            cout << "Invalid date or time input.\n";
+            return;
+        }
+
+        // Add the task at the initial start time
+        addTaskByTotalHours(start, end, taskDescription);
+
+        // Add recurring tasks
+        int nextStart = start + frequency;
+        int nextEnd = end + frequency;
+        while (nextStart < segmentTree.getSize()) {
+            addTaskByTotalHours(nextStart, nextEnd, taskDescription);
+            nextStart += frequency;
+            nextEnd += frequency;
+        }
+
+        cout << "Recurring task added successfully.\n";
+    }
 };
 
+// Main loop to interact with the task scheduler
 int main() {
-    int n = 365 * 24; // Maximum hours in 2025 (365 days * 24 hours)
-    TaskScheduler scheduler(n);
+    TaskScheduler scheduler(365 * 24); // For example, 365 days with 24 hours per day
 
     while (true) {
-        cout << "\nTask Scheduler Menu:\n";
+        cout << "\n----------------------------------------\n";
+        cout << "Task Scheduler Menu:\n";
         cout << "1. Add Task\n";
         cout << "2. Delete Task\n";
-        cout << "3. Get Task Count at Time\n";
-        cout << "4. Get Tasks by Interval\n";
-        cout << "5. Get Earliest Task Start Time\n";
-        cout << "6. Display All Tasks\n"; // New option
-        cout << "7. Exit\n";
-        cout << "Choose an option: ";
-
+        cout << "3. Query Task Count at Time\n";
+        cout << "4. Query Tasks by Interval\n";
+        cout << "5. Display All Tasks\n";
+        cout << "6. Add Recurring Task\n";
+        cout << "7. Show Next Earliest Task\n";
+        cout << "8. Exit\n";
+        cout << "----------------------------------------\n";
+        cout << "Enter your choice (1-8): ";
         int choice;
         cin >> choice;
 
         if (choice == 1) {
-            int month, day, startHour, endHour;
-            string description;
-            cout << "Enter task details:\n";
-            cout << "Month (1-12): ";
-            cin >> month;
-            cout << "Day (1-31): ";
-            cin >> day;
-            cout << "Start Time (Hour): ";
-            cin >> startHour;
-            cout << "End Time (Hour): ";
-            cin >> endHour;
-            cin.ignore(); // To consume the newline character
-            cout << "Task Description: ";
-            getline(cin, description);
-            scheduler.addTask(2025, month, day, startHour, endHour, description);
+            int year, month, day, startHour, endHour;
+            string taskDescription;
+            cout << "Enter year, month, day (YYYY MM DD): ";
+            cin >> year >> month >> day;
+            cout << "Enter start hour and end hour (0-23): ";
+            cin >> startHour >> endHour;
+            cout << "Enter task description: ";
+            cin.ignore(); // To ignore leftover newline character
+            getline(cin, taskDescription);
+
+            scheduler.addTask(year, month, day, startHour, endHour, taskDescription);
+            cout << "Task added successfully!\n";
         } else if (choice == 2) {
-            int month, day, startHour, endHour;
-            cout << "Enter task details to delete:\n";
-            cout << "Month (1-12): ";
-            cin >> month;
-            cout << "Day (1-31): ";
-            cin >> day;
-            cout << "Start Time (Hour): ";
-            cin >> startHour;
-            cout << "End Time (Hour): ";
-            cin >> endHour;
-            scheduler.deleteTask(2025, month, day, startHour, endHour);
+            int year, month, day, startHour, endHour;
+            cout << "Enter year, month, day (YYYY MM DD): ";
+            cin >> year >> month >> day;
+            cout << "Enter start hour and end hour (0-23): ";
+            cin >> startHour >> endHour;
+
+            scheduler.deleteTask(year, month, day, startHour, endHour);
+            cout << "Task deleted successfully!\n";
         } else if (choice == 3) {
-            int month, day, hour;
-            cout << "Enter time to get task count:\n";
-            cout << "Month (1-12): ";
-            cin >> month;
-            cout << "Day (1-31): ";
-            cin >> day;
-            cout << "Hour: ";
-            cin >> hour;
-            int count = scheduler.getTaskCountAtTime(2025, month, day, hour);
-            if (count != -1) {
-                cout << "Tasks at " << day << "-" << month << " " << hour
-                     << ":00 = " << count << endl;
-            }
+            int year, month, day, hour;
+            cout << "Enter year, month, day, hour (YYYY MM DD HH): ";
+            cin >> year >> month >> day >> hour;
+            cout << "Task count at the given time: " 
+                 << scheduler.getTaskCountAtTime(year, month, day, hour) << endl;
         } else if (choice == 4) {
-            int month, day, startHour, endHour;
-            cout << "Enter month (1-12) and day to get tasks:\n";
-            cout << "Month (1-12): ";
-            cin >> month;
-            cout << "Day (1-31): ";
-            cin >> day;
-            cout << "Start Time (Hour): ";
-            cin >> startHour;
-            cout << "End Time (Hour): ";
-            cin >> endHour;
-            vector<string> tasks = scheduler.getTasksByInterval(2025, month, day, startHour, endHour);
-            cout << "Tasks scheduled: ";
-            if (tasks.empty()) {
-                cout << "No tasks scheduled.";
-            } else {
-                for (const auto &task : tasks) {
-                    cout << task << " ";
-                }
+            int year, month, day, startHour, endHour;
+            cout << "Enter year, month, day, start hour, end hour (YYYY MM DD HH HH): ";
+            cin >> year >> month >> day >> startHour >> endHour;
+
+            auto tasks = scheduler.getTasksByInterval(year, month, day, startHour, endHour);
+            cout << "Tasks in the given interval:\n";
+            for (const auto &task : tasks) {
+                cout << task << endl;
             }
-            cout << endl;
         } else if (choice == 5) {
+            scheduler.displayAllTasks();
+        } else if (choice == 6) {
+            int year, month, day, startHour, endHour, frequency;
+            string taskDescription;
+            cout << "Enter year, month, day (YYYY MM DD): ";
+            cin >> year >> month >> day;
+            cout << "Enter start hour and end hour (0-23): ";
+            cin >> startHour >> endHour;
+            cout << "Enter frequency in hours: ";
+            cin >> frequency;
+            cout << "Enter task description: ";
+            cin.ignore(); // To ignore leftover newline character
+            getline(cin, taskDescription);
+
+            scheduler.addRecurringTask(year, month, day, startHour, endHour, taskDescription, frequency);
+            cout << "Recurring task added successfully!\n";
+        } else if (choice == 7) {
             auto earliest = scheduler.getEarliestTask();
             if (earliest.first != -1) {
                 cout << "Earliest task starts at: " << getDateFromHours(earliest.first)
@@ -443,12 +463,11 @@ int main() {
             } else {
                 cout << "No tasks scheduled." << endl;
             }
-        } else if (choice == 6) {
-            scheduler.displayAllTasks(); // Call the display function
-        } else if (choice == 7) {
-            break; // Exit the loop
+        } else if (choice == 8) {
+            cout << "Exiting the Task Scheduler. Goodbye!\n";
+            break;
         } else {
-            cout << "Invalid option. Please try again." << endl;
+            cout << "Invalid choice. Please enter a number between 1 and 8.\n";
         }
     }
 
